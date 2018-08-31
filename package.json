@@ -1,0 +1,11 @@
+{
+  "name": "trunks",
+  "version": "0.1.0",
+  "description": "Simple JS logging",
+  "main": "trunks.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vincent Blom <blomvin@gmail.com>",
+  "license": "MIT"
+}
