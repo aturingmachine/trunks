@@ -22,12 +22,14 @@ You can also pass in a custom `log-level` that will be output as `\x1b[35m` Mage
 
 ## Installation
 
-> TODO
+```bash
+npm install --save trunks-log
+```
 
 ## Example
 
 ```js
-const { trunks } = require('trunks')
+const { trunks } = require('trunks-log')
 
 trunks('info', 'Hello From Trunks!')
 ```
