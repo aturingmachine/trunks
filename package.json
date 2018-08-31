@@ -1,5 +1,5 @@
 {
-  "name": "trunks",
+  "name": "trunks-log",
   "version": "0.1.0",
   "description": "Simple JS logging",
   "main": "trunks.js",
