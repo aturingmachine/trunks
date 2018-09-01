@@ -7,42 +7,75 @@ const colors = {
   "Blue": "\x1b[34m",
   "Magenta": "\x1b[35m",
   "Cyan": "\x1b[36m",
-  "White": "\x1b[37m"
+  "White": "\x1b[37m",
 }
 
-let padNum = 17
-let defaultColor = colors.Magenta
-
-exports.trunks = (logLevel, message, err = null) => {
+genTimestamp = () => {
   let date = new Date()
-  let timestamp =  date.getUTCDate() + "/" + date.getUTCMonth() + "/" + date.getUTCFullYear() + 
-  "::" + date.getUTCHours() + ":" + date.getUTCMinutes() + ":" + date.getUTCSeconds()
+  let timestamp = date.getUTCDate() + "/" + date.getUTCMonth() + "/" + date.getUTCFullYear() +
+      "::" + date.getUTCHours() + ":" + date.getUTCMinutes() + ":" + date.getUTCSeconds()
 
-  let padding = " ".repeat(padNum - logLevel.length)
-  let levelColor = defaultColor
+  return timestamp
+}
 
-  switch (logLevel) {
-    case 'error':
-      levelColor = colors.Red
-      break
-    case 'success': 
-      levelColor = colors.Green
-      break
-    case 'info':
-      levelColor = colors.Cyan
-      break
-    case 'warn':
-      levelColor = colors.Yellow
-      break
+genPaddingString = (logLevel) => {
+  return " ".repeat(17 - logLevel.length)
+}
+
+buildPrintString = (template, args) => {
+  if (args.length != (template.match(/{}/g)||[]).length) {
+    this.trunks.log('trunks-error', 'Replacement templates (open-close curly braces) must match number of provided arguments')
   }
 
-    console.log(`${colors.Blue} ${timestamp} ${colors.reset}` + 
-    `${colors.bold + levelColor} [${logLevel}]${padding}` +
-    `${colors.reset + colors.White} ${message} ${colors.reset}`)
-
-  if (err) {
-    console.log(`${colors.Red}`)
-    console.log(err.stack)
-    console.log(`${colors.reset}`)
+  while ((template.match(/{}/g)||[]).length) {
+    template = template.replace('{}', args.shift())
   }
+
+  return template
+}
+
+exports.trunks = {
+
+  log: (level, message, ...args) => {
+    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+      `${colors.bold + colors.Magenta} [${level.toUpperCase()}]${genPaddingString(level)}` +
+      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+  },
+
+  warn: (message, ...args) => {
+    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+      `${colors.bold + colors.Yellow} [WARN]${genPaddingString('warn')}` +
+      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+  },
+
+  info: (message, ...args) => {
+    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+      `${colors.bold + colors.Cyan} [INFO]${genPaddingString('info')}` +
+      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+  },
+
+  success: (message, ...args) => {
+    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+      `${colors.bold + colors.Green} [SUCCESS]${genPaddingString('success')}` +
+      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+  },
+
+  debug: (message, ...args) => {
+    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+      `${colors.bold + colors.Yellow} [DEBUG]${genPaddingString('debug')}` +
+      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+  },
+
+  error: (err, message, ...args) => {
+
+    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+      `${colors.bold + colors.Red} [ERROR]${genPaddingString('error')}` +
+      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+
+    if (err) {
+      console.log(`${colors.Red}`)
+      console.log(err.stack)
+      console.log(`${colors.reset}`)
+    }
+  },
 }

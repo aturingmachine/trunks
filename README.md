@@ -4,21 +4,22 @@ trunks is a simple logger for NodeJS projects. It writes to stdout. I wrote trun
 
 ## Usage
 
-`trunks(<log-level>, <message>, <err>)`
+trunks has 5 built in logging levels, `debug, info, success, warn, error` with predefined coloring in their output to make them easier to spot in a slew of logs.
 
-`log-level` is the level at which you want the log displayed at, trunks supports 4 predefined levels
- - `success`
- - `info`
- - `warn`
- - `error`
+ - `debug` prints in yellow
+ - `warn` prints in yellow
+ - `info` prints in cyan
+ - `success` prints in green
+ - `error` prints in red (including a passed error's stacktrace)
 
-These levels simply outut the level info in a different color, and make life simpler when parsing logs.
+ You can also use the generic `trunks.log()` function to print a log with a custom tag in it, this will be printed in magenta.
 
-You can also pass in a custom `log-level` that will be output as `\x1b[35m` Magenta to stdout.
+ trunks supports variable replacement, meaning we can pass a template and a list of args to the functions to format the string.
 
-`message` is just a string that you want logged
+ `trunks.info('Hello from {}!', 'trunks')`
 
-`err` is an error object, this defaults to null. If passed the stack will be printed by trunks to stdout
+ Will outut: 
+ `Hello from trunks!` in the message section of the log.
 
 ## Installation
 
@@ -29,9 +30,14 @@ npm install --save trunks-log
 ## Example
 
 ```js
-const { trunks } = require('trunks-log')
+const { trunks } = require('../trunks')
 
-trunks('info', 'Hello From Trunks!')
+trunks.success('Hello from a {} success {}!', 'trunks', 'log')
+trunks.info('Hello from a {} info {}!', 'trunks', 'log')
+trunks.debug('Hello from a {} debug {}!', 'trunks', 'log')
+trunks.warn('Hello from a {} warning {}!', 'trunks', 'log')
+trunks.log('custom level', 'Hello from a {} custom level {}!', 'trunks', 'log')
+trunks.error(new Error('Example Error'), 'Hello from a {} error {}!', 'trunks', 'log')
 ```
 
 Will produce:
