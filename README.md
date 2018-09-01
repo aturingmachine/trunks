@@ -42,7 +42,7 @@ trunks.error(new Error('Example Error'), 'Hello from a {} error {}!', 'trunks', 
 
 Will produce:
 
-![trunks example](https://github.com/aturingmachine/trunks/blob/master/examples/trunksExample.png)
+![trunks example](https://raw.githubusercontent.com/aturingmachine/trunks/master/examples/trunksExample.png)
 
 ## Contributing
 
