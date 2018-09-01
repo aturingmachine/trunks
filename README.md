@@ -46,7 +46,7 @@ Will produce:
 
 ## Contributing
 
-Please feel free to contribute to this project!
+Please feel free to contribute to this project! I am open to any and all suggestions. Simply fork it and make a pr and we can discuss the changes there!
 
 ### Notes
 

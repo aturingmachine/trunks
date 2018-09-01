@@ -1,7 +1,7 @@
 {
   "name": "trunks-log",
-  "version": "0.1.1",
-  "description": "Simple JS logging",
+  "version": "1.0.0",
+  "description": "Simple JS logging to stdout",
   "main": "trunks.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
