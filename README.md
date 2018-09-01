@@ -1,4 +1,5 @@
 # Trunks
+[![npm version](https://badge.fury.io/js/trunks-log.svg)](https://badge.fury.io/js/trunks-log)
 
 trunks is a simple logger for NodeJS projects. It writes to stdout. I wrote trunks because I couldn't find a lightweight logger that did the bare minimum.
 
