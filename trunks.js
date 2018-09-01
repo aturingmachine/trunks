@@ -7,7 +7,6 @@ const colors = {
   "Blue": "\x1b[34m",
   "Magenta": "\x1b[35m",
   "Cyan": "\x1b[36m",
-  "White": "\x1b[37m",
 }
 
 genTimestamp = () => {
@@ -15,67 +14,84 @@ genTimestamp = () => {
   let timestamp = date.getUTCDate() + "/" + date.getUTCMonth() + "/" + date.getUTCFullYear() +
       "::" + date.getUTCHours() + ":" + date.getUTCMinutes() + ":" + date.getUTCSeconds()
 
-  return timestamp
+  return timestamp + colors.reset
 }
 
 genPaddingString = (logLevel) => {
-  return " ".repeat(17 - logLevel.length)
+  return " ".repeat(17 - logLevel.length) + colors.reset
 }
 
 buildPrintString = (template, args) => {
   if (args.length != (template.match(/{}/g)||[]).length) {
-    this.trunks.log('trunks-error', 'Replacement templates (open-close curly braces) must match number of provided arguments')
+    this.trunks.log('trunks-error', 'Replacement templates (open-close curly braces) must match number of provided arguments, error occurred on template: ' + template)
+    return null
   }
 
   while ((template.match(/{}/g)||[]).length) {
     template = template.replace('{}', args.shift())
   }
 
-  return template
+  return template + colors.reset
 }
 
 exports.trunks = {
 
   log: (level, message, ...args) => {
-    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+    let logMessage = buildPrintString(message, args)
+    if (logMessage) {
+    console.log(`${colors.Blue} ${genTimestamp()}` +
       `${colors.bold + colors.Magenta} [${level.toUpperCase()}]${genPaddingString(level)}` +
-      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+      ` ${logMessage}`)
+    }
   },
 
   warn: (message, ...args) => {
-    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+    let logMessage = buildPrintString(message, args)
+    if (logMessage) {
+    console.log(`${colors.Blue} ${genTimestamp()}` +
       `${colors.bold + colors.Yellow} [WARN]${genPaddingString('warn')}` +
-      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+      ` ${logMessage}`)
+    }
   },
 
   info: (message, ...args) => {
-    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+    let logMessage = buildPrintString(message, args)     
+    if (logMessage) {
+    console.log(`${colors.Blue} ${genTimestamp()}` +
       `${colors.bold + colors.Cyan} [INFO]${genPaddingString('info')}` +
-      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+      ` ${logMessage}`)
+    }
   },
 
   success: (message, ...args) => {
-    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+    let logMessage = buildPrintString(message, args)     
+    if (logMessage) {
+    console.log(`${colors.Blue} ${genTimestamp()}` +
       `${colors.bold + colors.Green} [SUCCESS]${genPaddingString('success')}` +
-      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+      ` ${logMessage}`)
+    }
   },
 
   debug: (message, ...args) => {
-    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+    let logMessage = buildPrintString(message, args)     
+    if (logMessage) {
+    console.log(`${colors.Blue} ${genTimestamp()}` +
       `${colors.bold + colors.Yellow} [DEBUG]${genPaddingString('debug')}` +
-      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+      ` ${logMessage}`)
+    }
   },
 
   error: (err, message, ...args) => {
+    let logMessage = buildPrintString(message, args)     
+    if (logMessage) {
 
-    console.log(`${colors.Blue} ${genTimestamp()} ${colors.reset}` +
+    console.log(`${colors.Blue} ${genTimestamp()}` +
       `${colors.bold + colors.Red} [ERROR]${genPaddingString('error')}` +
-      `${colors.reset + colors.White} ${buildPrintString(message, args)} ${colors.reset}`)
+      ` ${logMessage}`)
 
     if (err) {
-      console.log(`${colors.Red}`)
-      console.log(err.stack)
-      console.log(`${colors.reset}`)
+      console.log(colors.Red + err.stack + colors.reset)
     }
+  }
   },
 }

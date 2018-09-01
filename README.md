@@ -18,7 +18,7 @@ trunks has 5 built in logging levels, `debug, info, success, warn, error` with p
 
  `trunks.info('Hello from {}!', 'trunks')`
 
- Will outut: 
+ Will output: 
  `Hello from trunks!` in the message section of the log.
 
 ## Installation
