@@ -15,7 +15,7 @@ genTimestamp = () => {
   let timestamp = date.getUTCDate() + "/" + date.getUTCMonth() + "/" + date.getUTCFullYear() +
     "::" + date.getUTCHours() + ":" + date.getUTCMinutes() + ":" + date.getUTCSeconds()
 
-  return timestamp + colors.reset
+  return '[' + timestamp + ']' + colors.reset
 }
 
 genPaddingString = (logLevel) => {
@@ -29,7 +29,11 @@ buildPrintString = (template, args) => {
   }
 
   while ((template.match(/{}/g) || []).length) {
-    template = template.replace('{}', args.shift())
+    let replacementArg = args.shift()
+    if (replacementArg instanceof Object) {
+      replacementArg = JSON.stringify(replacementArg)
+    }
+    template = template.replace('{}', replacementArg)
   }
 
   return template + colors.reset
@@ -49,13 +53,11 @@ exports.trunks = {
   },
 
   warn: (message, ...args) => {
-    if (this.trunks.thresholdLevel !== 'PROD') {
-      let logMessage = buildPrintString(message, args)
-      if (logMessage) {
-        console.log(`${colors.Blue} ${genTimestamp()}` +
-          `${colors.bold + colors.Yellow} [WARN]${genPaddingString('warn')}` +
-          ` ${logMessage}`)
-      }
+    let logMessage = buildPrintString(message, args)
+    if (logMessage) {
+      console.log(`${colors.Blue} ${genTimestamp()}` +
+        `${colors.bold + colors.Yellow} [WARN]${genPaddingString('warn')}` +
+        ` ${logMessage}`)
     }
   },
 
@@ -78,11 +80,13 @@ exports.trunks = {
   },
 
   debug: (message, ...args) => {
-    let logMessage = buildPrintString(message, args)
-    if (logMessage) {
-      console.log(`${colors.Blue} ${genTimestamp()}` +
-        `${colors.bold + colors.Yellow} [DEBUG]${genPaddingString('debug')}` +
-        ` ${logMessage}`)
+    if (this.trunks.thresholdLevel !== 'PROD') {
+      let logMessage = buildPrintString(message, args)
+      if (logMessage) {
+        console.log(`${colors.Blue} ${genTimestamp()}` +
+          `${colors.bold + colors.Yellow} [DEBUG]${genPaddingString('debug')}` +
+          ` ${logMessage}`)
+      }
     }
   },
 

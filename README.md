@@ -22,6 +22,19 @@ trunks has 5 built in logging levels, `debug, info, success, warn, error` with p
  Will output: 
  `Hello from trunks!` in the message section of the log.
 
+ trunks also supports passing objects into the template, they will be output as the result of a `JSON.stringify()` call.
+
+### Logging Levels
+
+trunks currently supports 2 logging levels, `PROD` and `DEBUG`. 
+
+> Any more ideas for further support of logging levels is greatly appreciated
+
+- `DEBUG` will log everything
+- `PROD` will *NOT* log `debug`, or the stacktrace from `error` calls. (This is open to change)
+
+Setting the level to prod should not effect performance as the level check occurs prior to the building of the template.
+
 ## Installation
 
 ```bash
