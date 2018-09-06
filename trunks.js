@@ -19,14 +19,19 @@ genTimestamp = () => {
 }
 
 genPaddingString = (logLevel, pad) => {
-  return " ".repeat(pad - logLevel.length) + colors.reset
+  if (pad - logLevel.length > 0 ) {
+    return " ".repeat(pad - logLevel.length) + colors.reset
+  } else {
+    return " " + colors.reset
+  }
 }
 
 buildPrintString = (template, args) => {
   //need to fix this check
   if (args.length != (template.match(/{}/g) || []).length) {
-    const me = new trunks('TRUNKS', 'red', 'DEBUG')
-    me.error(new Error('trunks replacement count mismatch on template: ' + template), 'Replacement templates (open-close curly braces) must match number of provided arguments')
+    const me = new trunks('TRUNKS-LOG', 'red', 'DEBUG')
+    me.error(new Error('trunks replacement count mismatch on template: "' + template.substring(0, 25) + '..."'),
+     'Replacement templates "{ }" must match number of provided arguments')
     return null
   }
 
@@ -65,15 +70,27 @@ getNamespaceColor = (passedColor) => {
 }
 
 class trunks {
-  constructor(initNamespace = 'APP', namespaceColor = 'magenta', level = 'DEBUG') {
-    this.thresholdLevel = levels.includes(level.toUpperCase()) ? level.toUpperCase() : 'DEBUG'
+  /**
+   * Constructor
+   * 
+   * @param {string=} [initNamespace="APP"] - The namespace for the instance of the logger
+   * @param {string=} [namespaceColor="magenta"] - Color for the namespace print | `['yellow', 'red', 'blue', 'green']`
+   * @param {string=} [level="DEBUG"] - The logging level that the instance should run at | `['DEBUG', 'PROD']`
+   */
+  constructor(initNamespace = 'APP', namespaceColor = 'magenta', thresholdLevel = 'DEBUG') {
+    this.thresholdLevel = levels.includes(thresholdLevel.toUpperCase()) ? thresholdLevel.toUpperCase() : 'DEBUG'
     this.namespace = initNamespace
     this.namespaceColor = colors.bold + (colors[namespaceColor.toUpperCase()] == undefined ? colors.YELLOW : colors[namespaceColor.toUpperCase()])
   }
 
-  debug(message, ...args) {
+  /**
+   * 
+   * @param {string} template - The template that should be run. Variables can be noted using `{}`
+   * @param  {...string} args - Values to replace instances of `{}` in `template`. All variables passed after the template will be considered variables.
+   */
+  debug(template, ...args) {
     if (this.thresholdLevel !== 'PROD') {
-      let logMessage = buildPrintString(message, args)
+      let logMessage = buildPrintString(template, args)
       if (logMessage) {
         console.log(`${colors.BLUE} ${genTimestamp()} ` +
           `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
@@ -83,8 +100,14 @@ class trunks {
     }
   }
 
-  log(level, message, ...args) {
-    let logMessage = buildPrintString(message, args)
+  /**
+   * 
+   * @param {string} level - A custom level
+   * @param {string} template - The template that should be run. Variables can be noted using `{}`
+   * @param  {...string} args - Values to replace instances of `{}` in `template`. All variables passed after the template will be considered variables.
+   */
+  log(level, template, ...args) {
+    let logMessage = buildPrintString(template, args)
     if (logMessage) {
       console.log(`${colors.BLUE} ${genTimestamp()} ` +
         `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
@@ -93,10 +116,15 @@ class trunks {
     }
   }
 
-  warn(message, ...args) {
+  /**
+   * 
+   * @param {string} template - The template that should be run. Variables can be noted using `{}`
+   * @param  {...string} args - Values to replace instances of `{}` in `template`. All variables passed after the template will be considered variables.
+   */
+  warn(template, ...args) {
     // console.log('NAMESPACE ON WARN: ' + this.namespace)
     // console.log()
-    let logMessage = buildPrintString(message, args)
+    let logMessage = buildPrintString(template, args)
     if (logMessage) {
       console.log(`${colors.BLUE} ${genTimestamp()} ` +
         `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
@@ -105,8 +133,13 @@ class trunks {
     }
   }
 
-  info(message, ...args) {
-    let logMessage = buildPrintString(message, args)
+  /**
+   * 
+   * @param {string} template - The template that should be run. Variables can be noted using `{}`
+   * @param  {...string} args - Values to replace instances of `{}` in `template`. All variables passed after the template will be considered variables.
+   */
+  info(template, ...args) {
+    let logMessage = buildPrintString(template, args)
     if (logMessage) {
       console.log(`${colors.BLUE} ${genTimestamp()} ` +
         `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
@@ -115,8 +148,13 @@ class trunks {
     }
   }
 
-  success(message, ...args) {
-    let logMessage = buildPrintString(message, args)
+  /**
+   * 
+   * @param {string} template - The template that should be run. Variables can be noted using `{}`
+   * @param  {...string} args - Values to replace instances of `{}` in `template`. All variables passed after the template will be considered variables.
+   */
+  success(template, ...args) {
+    let logMessage = buildPrintString(template, args)
     if (logMessage) {
       console.log(`${colors.BLUE} ${genTimestamp()} ` +
         `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
@@ -125,8 +163,14 @@ class trunks {
     }
   }
 
-  error(err, message, ...args) {
-    let logMessage = buildPrintString(message, args)
+  /**
+   * 
+   * @param {Error=} [err] - An error to pass to the function. If no error is needed simply pass `null`
+   * @param {string} template - The template that should be run. Variables can be noted using `{}`
+   * @param  {...string} args - Values to replace instances of `{}` in `template`. All variables passed after the template will be considered variables.
+   */
+  error(err, template, ...args) {
+    let logMessage = buildPrintString(template, args)
     if (logMessage) {
       console.log(`${colors.BLUE} ${genTimestamp()} ` +
         `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
