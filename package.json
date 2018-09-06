@@ -1,6 +1,6 @@
 {
   "name": "trunks-log",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Simple JS logging to stdout!",
   "url": "https://github.com/aturingmachine/trunks",
   "main": "trunks.js",
