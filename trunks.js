@@ -79,7 +79,7 @@ class trunks {
    */
   constructor(initNamespace = 'APP', namespaceColor = 'magenta', thresholdLevel = 'DEBUG') {
     this.thresholdLevel = levels.includes(thresholdLevel.toUpperCase()) ? thresholdLevel.toUpperCase() : 'DEBUG'
-    this.namespace = initNamespace
+    this.namespace = initNamespace.length > 0 ? initNamespace : 'APP'
     this.namespaceColor = colors.bold + (colors[namespaceColor.toUpperCase()] == undefined ? colors.YELLOW : colors[namespaceColor.toUpperCase()])
   }
 
