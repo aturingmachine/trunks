@@ -1,12 +1,12 @@
 const colors = {
   "reset": "\x1b[0m",
   "bold": "\x1b[1m",
-  "Red": "\x1b[31m",
-  "Green": "\x1b[32m",
-  "Yellow": "\x1b[33m",
-  "Blue": "\x1b[34m",
-  "Magenta": "\x1b[35m",
-  "Cyan": "\x1b[36m",
+  "RED": "\x1b[31m",
+  "GREEN": "\x1b[32m",
+  "YELLOW": "\x1b[33m",
+  "BLUE": "\x1b[34m",
+  "MAGENTA": "\x1b[35m",
+  "CYAN": "\x1b[36m",
 }
 let levels = ['PROD', 'DEBUG']
 
@@ -18,13 +18,15 @@ genTimestamp = () => {
   return '[' + timestamp + ']' + colors.reset
 }
 
-genPaddingString = (logLevel) => {
-  return " ".repeat(17 - logLevel.length) + colors.reset
+genPaddingString = (logLevel, pad) => {
+  return " ".repeat(pad - logLevel.length) + colors.reset
 }
 
 buildPrintString = (template, args) => {
+  //need to fix this check
   if (args.length != (template.match(/{}/g) || []).length) {
-    this.trunks.log('trunks-error', 'Replacement templates (open-close curly braces) must match number of provided arguments, error occurred on template: ' + template)
+    const me = new trunks('TRUNKS', 'red', 'DEBUG')
+    me.error(new Error('trunks replacement count mismatch on template: ' + template), 'Replacement templates (open-close curly braces) must match number of provided arguments')
     return null
   }
 
@@ -39,76 +41,103 @@ buildPrintString = (template, args) => {
   return template + colors.reset
 }
 
-exports.trunks = {
+buildNamespaceString = (namespace, color) => {
+  return color + '[' + namespace + ']' + colors.reset
+}
 
-  thresholdLevel: 'DEBUG',
+buildLevelString = (level, color) => {
+  return ` ${colors.bold + color}[${level.toUpperCase()}]${colors.reset}`
+}
 
-  log: (level, message, ...args) => {
-    let logMessage = buildPrintString(message, args)
-    if (logMessage) {
-      console.log(`${colors.Blue} ${genTimestamp()}` +
-        `${colors.bold + colors.Magenta} [${level.toUpperCase()}]${genPaddingString(level)}` +
-        ` ${logMessage}`)
-    }
-  },
+getNamespaceColor = (passedColor) => {
+  switch (passedColor.toUpperCase()) {
+    case 'YELLOW':
+      return colors.YELLOW
+    case 'RED':
+      return colors.RED
+    case 'BLUE':
+      return colors.BLUE
+    case 'GREEN':
+      return colors.GREEN
+    default:
+      return colors.MAGENTA
+  }
+}
 
-  warn: (message, ...args) => {
-    let logMessage = buildPrintString(message, args)
-    if (logMessage) {
-      console.log(`${colors.Blue} ${genTimestamp()}` +
-        `${colors.bold + colors.Yellow} [WARN]${genPaddingString('warn')}` +
-        ` ${logMessage}`)
-    }
-  },
+class trunks {
+  constructor(initNamespace = 'APP', namespaceColor = 'magenta', level = 'DEBUG') {
+    this.thresholdLevel = levels.includes(level.toUpperCase()) ? level.toUpperCase() : 'DEBUG'
+    this.namespace = initNamespace
+    this.namespaceColor = colors.bold + (colors[namespaceColor.toUpperCase()] == undefined ? colors.YELLOW : colors[namespaceColor.toUpperCase()])
+  }
 
-  info: (message, ...args) => {
-    let logMessage = buildPrintString(message, args)
-    if (logMessage) {
-      console.log(`${colors.Blue} ${genTimestamp()}` +
-        `${colors.bold + colors.Cyan} [INFO]${genPaddingString('info')}` +
-        ` ${logMessage}`)
-    }
-  },
-
-  success: (message, ...args) => {
-    let logMessage = buildPrintString(message, args)
-    if (logMessage) {
-      console.log(`${colors.Blue} ${genTimestamp()}` +
-        `${colors.bold + colors.Green} [SUCCESS]${genPaddingString('success')}` +
-        ` ${logMessage}`)
-    }
-  },
-
-  debug: (message, ...args) => {
-    if (this.trunks.thresholdLevel !== 'PROD') {
+  debug(message, ...args) {
+    if (this.thresholdLevel !== 'PROD') {
       let logMessage = buildPrintString(message, args)
       if (logMessage) {
-        console.log(`${colors.Blue} ${genTimestamp()}` +
-          `${colors.bold + colors.Yellow} [DEBUG]${genPaddingString('debug')}` +
+        console.log(`${colors.BLUE} ${genTimestamp()} ` +
+          `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
+          `${buildLevelString('debug', colors.YELLOW)}${genPaddingString('debug', 10)}` +
           ` ${logMessage}`)
       }
     }
-  },
+  }
 
-  error: (err, message, ...args) => {
+  log(level, message, ...args) {
     let logMessage = buildPrintString(message, args)
     if (logMessage) {
+      console.log(`${colors.BLUE} ${genTimestamp()} ` +
+        `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
+        `${buildLevelString(level, colors.MAGENTA)}${genPaddingString(level, 10)}` +
+        ` ${logMessage}`)
+    }
+  }
 
-      console.log(`${colors.Blue} ${genTimestamp()}` +
-        `${colors.bold + colors.Red} [ERROR]${genPaddingString('error')}` +
+  warn(message, ...args) {
+    // console.log('NAMESPACE ON WARN: ' + this.namespace)
+    // console.log()
+    let logMessage = buildPrintString(message, args)
+    if (logMessage) {
+      console.log(`${colors.BLUE} ${genTimestamp()} ` +
+        `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
+        `${buildLevelString('warn', colors.YELLOW)}${genPaddingString('warn', 10)}` +
+        ` ${logMessage}`)
+    }
+  }
+
+  info(message, ...args) {
+    let logMessage = buildPrintString(message, args)
+    if (logMessage) {
+      console.log(`${colors.BLUE} ${genTimestamp()} ` +
+        `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
+        `${buildLevelString('info', colors.CYAN)}${genPaddingString('info', 10)}` +
+        ` ${logMessage}`)
+    }
+  }
+
+  success(message, ...args) {
+    let logMessage = buildPrintString(message, args)
+    if (logMessage) {
+      console.log(`${colors.BLUE} ${genTimestamp()} ` +
+        `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
+        `${buildLevelString('success', colors.GREEN)}${genPaddingString('success', 10)}` +
+        ` ${logMessage}`)
+    }
+  }
+
+  error(err, message, ...args) {
+    let logMessage = buildPrintString(message, args)
+    if (logMessage) {
+      console.log(`${colors.BLUE} ${genTimestamp()} ` +
+        `${buildNamespaceString(this.namespace, this.namespaceColor)}${genPaddingString(this.namespace, 10)}` +
+        `${buildLevelString('error', colors.RED)}${genPaddingString('error', 10)}` +
         ` ${logMessage}`)
 
-      if (err && this.trunks.thresholdLevel != 'PROD') {
-        console.log(colors.Red + err.stack + colors.reset)
+      if (err && this.thresholdLevel != 'PROD') {
+        console.log(colors.RED + err.stack + colors.reset)
       }
     }
-  },
-
-  setLevel: (newLevel) => {
-    if (!levels.includes(newLevel)) {
-      this.trunks.log('trunks-error', 'Desired Logging Level: {} is not supported', newLevel)
-      return
-    }
-    this.trunks.thresholdLevel = newLevel
-  },
+  }
 }
+
+module.exports = trunks;
