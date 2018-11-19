@@ -13,7 +13,7 @@ let levels = ['PROD', 'DEBUG']
 genTimestamp = () => {
   let date = new Date()
   let timestamp ='[' + (date.getUTCDate() < 10 ? '0' + date.getUTCDate() : date.getUTCDate())
-   + "/" + (date.getUTCMonth() < 10 ? '0' + date.getUTCMonth() : date.getUTCMonth()) + "/" + date.getUTCFullYear()
+   + "/" + (date.getUTCMonth() + 1 < 10 ? '0' + date.getUTCMonth() + 1 : date.getUTCMonth() + 1) + "/" + date.getUTCFullYear()
    + "::" + (date.getUTCHours() < 10 ? '0' + date.getUTCHours() : date.getUTCHours())
    + ":" + (date.getUTCMinutes() < 10 ? '0' + date.getUTCMinutes() : date.getUTCMinutes()) 
    + ":" + (date.getUTCSeconds() < 10 ? '0' + date.getUTCSeconds() : date.getUTCSeconds()) + ']'
